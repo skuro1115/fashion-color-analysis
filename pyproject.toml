@@ -2,7 +2,7 @@
 name = "fashion-color-analysis"
 version = "0.1.0"
 description = "服画像の代表色抽出ツール (K-means k=10 / Lab)"
-requires-python = ">=3.10"
+requires-python = ">=3.9"  # Mac 標準の python3 (3.9) でも run.command が動くように
 dependencies = [
     "numpy>=1.24",
     "opencv-python-headless>=4.8",
@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-fca = "fca.cli:main"
+fca = "fca.cli.main:main"
 
 [dependency-groups]
 dev = ["pytest>=8.0"]

@@ -6,7 +6,7 @@ import html
 import os
 from pathlib import Path
 
-from .pipeline import read_csv, safe_name
+from .csv_io import read_csv, safe_name
 
 REASON_LABELS = {
     "fg_too_small": "前景が小さい",
@@ -120,6 +120,11 @@ q('#count').textContent=n+' / '+cards.length+' 枚'}
 
 
 def build_preview(out_dir: Path) -> Path:
+    out_dir = Path(out_dir)
+    if not (out_dir / "images.csv").exists():
+        from ..errors import UserError
+
+        raise UserError(f"{out_dir}/images.csv がありません。先に画像の解析を実行してください。")
     images = read_csv(out_dir / "images.csv")
     raw = read_csv(out_dir / "raw_colors.csv")
     ana_path = out_dir / "analysis_colors.csv"

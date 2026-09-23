@@ -1,0 +1,8 @@
+# run.command が使う依存ライブラリ。pyproject.toml の dependencies と必ず一致させること
+# (tests/test_project.py で一致を確認している)
+numpy>=1.24
+opencv-python-headless>=4.8
+pillow>=10.0
+scikit-learn>=1.3
+scikit-image>=0.21
+pyyaml>=6.0

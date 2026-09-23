@@ -2,7 +2,10 @@
 __pycache__/
 *.pyc
 .pytest_cache/
+.DS_Store
 
-# 入力画像と出力は研究データなのでリポジトリに含めない
-images/
+# 入力画像と出力は研究データなのでリポジトリに含めない (フォルダ自体は残す)
+images/*
+!images/README.txt
 output/
+.venv-run/

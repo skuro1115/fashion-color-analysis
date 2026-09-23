@@ -8,6 +8,8 @@ from typing import Any
 
 import yaml
 
+from .errors import UserError
+
 DEFAULTS: dict[str, Any] = {
     "paths": {
         "images_dir": "images",
@@ -62,6 +64,11 @@ def _deep_merge(base: dict, override: dict) -> dict:
 def load_config(path: str | Path | None) -> dict[str, Any]:
     if path is None or not Path(path).exists():
         return copy.deepcopy(DEFAULTS)
-    with open(path, encoding="utf-8") as f:
-        user = yaml.safe_load(f) or {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            user = yaml.safe_load(f) or {}
+    except yaml.YAMLError as e:
+        raise UserError(f"{path} の書き方に誤りがあります (インデントや「:」を確認してください)\n{e}") from e
+    if not isinstance(user, dict):
+        raise UserError(f"{path} の書き方に誤りがあります")
     return _deep_merge(DEFAULTS, user)

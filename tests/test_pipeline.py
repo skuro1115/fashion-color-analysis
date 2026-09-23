@@ -3,14 +3,15 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-from fca.analyze import analyze_clusters
-from fca.colors import rgb_to_lab
+from fca.analysis.merge import analyze_clusters
+from fca.color_extraction.colorspace import rgb_to_lab
+from fca.color_extraction.kmeans import extract_clusters
 from fca.config import load_config
-from fca.dataset import parse_path
-from fca.extract import extract_clusters
-from fca.pipeline import read_csv, run_analyze, run_extract
-from fca.preview import build_preview
-from fca.segment import review_reasons, segment
+from fca.image_processing.loader import parse_path
+from fca.image_processing.review import review_reasons
+from fca.image_processing.segmentation import segment
+from fca.pipeline import build_preview, run_analyze, run_extract
+from fca.reporting.csv_io import read_csv
 
 CFG = load_config(None)
 

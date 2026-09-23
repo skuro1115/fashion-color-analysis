@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from .colors import delta_e, lab_to_rgb, rgb_to_hex
+from ..color_extraction.colorspace import delta_e, lab_to_rgb, rgb_to_hex
 
 
 def analyze_clusters(clusters: list[dict], cfg: dict) -> list[dict]:

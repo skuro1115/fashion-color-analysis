@@ -14,6 +14,8 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageOps
 
+from ..errors import UserError
+
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp"}
 _YEAR_SEASON = re.compile(r"^(?P<year>\d{4})(?:[_\-\s]?(?P<season>[A-Za-z]+))?$")
 PATH_FIELDS = ("brand", "year", "season")
@@ -68,7 +70,7 @@ def read_manifest(path: Path) -> dict[str, dict[str, str]]:
     with open(path, encoding="utf-8-sig", newline="") as f:
         reader = csv.DictReader(f)
         if not reader.fieldnames or "image_id" not in reader.fieldnames:
-            raise ValueError(f"{path}: 'image_id' 列が必要です")
+            raise UserError(f"{path} の1行目に image_id 列が必要です。")
         return {row["image_id"].strip(): row for row in reader if row.get("image_id")}
 
 
@@ -102,7 +104,7 @@ def write_manifest_template(records: list[ImageRecord], path: Path) -> int:
         cols = base_cols
     new = [r for r in records if r.image_id not in existing]
     mode = "a" if existing else "w"
-    with open(path, mode, encoding="utf-8", newline="") as f:
+    with open(path, mode, encoding="utf-8-sig", newline="") as f:  # Excel で編集できるよう BOM 付き
         writer = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")
         if not existing:
             writer.writeheader()

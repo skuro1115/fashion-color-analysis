@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 from sklearn.cluster import KMeans
 
-from .colors import lab_to_rgb, rgb_to_hex
+from .colorspace import lab_to_rgb, rgb_to_hex
 
 
 def extract_clusters(lab: np.ndarray, mask: np.ndarray, cfg: dict) -> list[dict]:
