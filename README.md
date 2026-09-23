@@ -2,15 +2,7 @@
 
 服の商品画像から **代表色を自動で取り出す** ツールです。
 
-```text
-  📁 images/          服の画像を入れる
-       │
-       ▼
-  🖱  run.command      ダブルクリック
-       │
-       ▼
-  🎨 output/          色・確認ページ・CSV ができる
-```
+![使い方: ダウンロード → images に画像を入れる → run.command をダブルクリック → 結果を見る](docs/images/how-to-use.png)
 
 ## Mac で使う
 

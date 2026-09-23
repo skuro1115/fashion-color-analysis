@@ -42,6 +42,7 @@ output/preview.html                                      ← preview ステー�
 | `requirements.txt` | run.command 用の依存。`pyproject.toml` と一致させる (テストで検査) |
 | `samples/` | 動作確認用の合成画像 |
 | `docs/` | 人間向けドキュメント。`technical.md` が仕様の詳細 |
+| `docs/images/src/` | README 等の図の元 HTML。PNG は直接編集せず、ここを直して再生成する |
 
 レイヤーの向き: `cli` / `run.command` / GUI → `pipeline` → 各処理パッケージ。逆向きの import を作らない。
 

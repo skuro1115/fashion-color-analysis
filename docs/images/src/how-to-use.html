@@ -1,0 +1,156 @@
+<!doctype html>
+<!--
+  README 冒頭の「使い方」図の元データ。編集したら docs/images/src/README.md の手順で PNG を再生成する。
+-->
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --ink: #1d1d1f; --muted: #6b6b70; --line: #e4e2dd; --card: #ffffff; --bg: #f6f5f1;
+    --accent: #2f5bd3; --navy: #1c2542; --red: #961d28; --green: #28773c; --beige: #c8aa78;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    width: 1200px; height: 420px; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .flow { display: flex; align-items: center; gap: 12px; }
+  .step {
+    width: 236px; height: 330px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 20px; padding: 22px 20px 20px; display: flex; flex-direction: column; align-items: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.05);
+  }
+  .num {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #fff;
+    font-weight: 700; font-size: 18px; display: grid; place-items: center;
+  }
+  .title { font-size: 21px; font-weight: 700; margin-top: 10px; letter-spacing: .02em; }
+  .art { flex: 1; width: 100%; display: grid; place-items: center; }
+  .desc { font-size: 14px; color: var(--muted); text-align: center; line-height: 1.5; }
+  .desc code { font-family: ui-monospace, Menlo, monospace; color: var(--ink); background: #f0efea; padding: 1px 5px; border-radius: 4px; }
+  .arrow { color: #b9b6ad; }
+</style>
+</head>
+<body>
+<div class="flow">
+
+  <!-- ① ダウンロード -->
+  <div class="step">
+    <div class="num">1</div>
+    <div class="title">ダウンロード</div>
+    <div class="art">
+      <svg width="150" height="150" viewBox="0 0 150 150">
+        <rect x="30" y="18" width="90" height="114" rx="10" fill="#eef1fb" stroke="#c9d3f3" stroke-width="2"/>
+        <rect x="68" y="18" width="14" height="10" fill="#c9d3f3"/><rect x="68" y="34" width="14" height="10" fill="#c9d3f3"/>
+        <rect x="68" y="50" width="14" height="10" fill="#c9d3f3"/>
+        <rect x="62" y="64" width="26" height="22" rx="4" fill="#2f5bd3"/>
+        <text x="75" y="118" text-anchor="middle" font-size="18" font-weight="700" fill="#2f5bd3" font-family="-apple-system, sans-serif">ZIP</text>
+        <circle cx="116" cy="118" r="20" fill="#2f5bd3"/>
+        <path d="M116 106 v18 M108 117 l8 8 l8 -8" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="desc">GitHub から ZIP を<br>ダウンロードして開く</div>
+  </div>
+
+  <svg class="arrow" width="30" height="30" viewBox="0 0 30 30"><path d="M4 15 H24 M17 8 l7 7 l-7 7" stroke="currentColor" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+  <!-- ② images に入れる -->
+  <div class="step">
+    <div class="num">2</div>
+    <div class="title">画像を入れる</div>
+    <div class="art">
+      <svg width="170" height="150" viewBox="0 0 170 150">
+        <defs>
+          <symbol id="tee" viewBox="0 0 40 40">
+            <path d="M13 4 h14 l11 9 -6 6 -3 -3 v21 h-18 v-21 l-3 3 -6 -6 z"/>
+          </symbol>
+        </defs>
+        <!-- 飛び込む画像 -->
+        <g transform="translate(22 6) rotate(-10)">
+          <rect width="46" height="54" rx="6" fill="#fff" stroke="#e4e2dd" stroke-width="2"/>
+          <use href="#tee" x="5" y="7" width="36" height="40" fill="#1c2542"/>
+        </g>
+        <g transform="translate(66 0)">
+          <rect width="46" height="54" rx="6" fill="#fff" stroke="#e4e2dd" stroke-width="2"/>
+          <use href="#tee" x="5" y="7" width="36" height="40" fill="#961d28"/>
+        </g>
+        <g transform="translate(106 10) rotate(10)">
+          <rect width="46" height="54" rx="6" fill="#fff" stroke="#e4e2dd" stroke-width="2"/>
+          <use href="#tee" x="5" y="7" width="36" height="40" fill="#28773c"/>
+        </g>
+        <!-- フォルダ -->
+        <path d="M18 72 h44 l10 10 h80 a8 8 0 0 1 8 8 v44 a8 8 0 0 1 -8 8 h-126 a8 8 0 0 1 -8 -8 v-54 a8 8 0 0 1 8 -8 z" fill="#f4c95d"/>
+        <path d="M10 92 h150 v42 a8 8 0 0 1 -8 8 h-134 a8 8 0 0 1 -8 -8 z" fill="#f7d77e"/>
+        <text x="85" y="124" text-anchor="middle" font-size="19" font-weight="700" fill="#7a5a12" font-family="ui-monospace, Menlo, monospace">images</text>
+      </svg>
+    </div>
+    <div class="desc"><code>images</code> フォルダに<br>服の画像を入れる</div>
+  </div>
+
+  <svg class="arrow" width="30" height="30" viewBox="0 0 30 30"><path d="M4 15 H24 M17 8 l7 7 l-7 7" stroke="currentColor" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+  <!-- ③ run.command -->
+  <div class="step">
+    <div class="num">3</div>
+    <div class="title">ダブルクリック</div>
+    <div class="art">
+      <svg width="160" height="150" viewBox="0 0 160 150">
+        <rect x="18" y="16" width="112" height="96" rx="14" fill="#1d1d1f"/>
+        <text x="36" y="58" font-size="26" font-weight="700" fill="#7ee08a" font-family="ui-monospace, Menlo, monospace">&gt;_</text>
+        <rect x="36" y="72" width="60" height="6" rx="3" fill="#4a4a4f"/>
+        <rect x="36" y="86" width="40" height="6" rx="3" fill="#4a4a4f"/>
+        <text x="70" y="140" text-anchor="middle" font-size="15" font-weight="600" fill="#1d1d1f" font-family="ui-monospace, Menlo, monospace">run.command</text>
+        <!-- カーソルとクリック -->
+        <g stroke="#2f5bd3" stroke-width="3" stroke-linecap="round" transform="translate(8 -20)">
+          <path d="M118 84 l-6 -6"/><path d="M128 80 v-9"/><path d="M138 84 l6 -6"/>
+        </g>
+        <path transform="translate(8 -20)" d="M122 88 l0 40 l10 -9 l7 15 l7 -3 l-7 -15 l13 -1 z" fill="#fff" stroke="#1d1d1f" stroke-width="2.5" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="desc"><code>run.command</code> を<br>ダブルクリック（自動で解析）</div>
+  </div>
+
+  <svg class="arrow" width="30" height="30" viewBox="0 0 30 30"><path d="M4 15 H24 M17 8 l7 7 l-7 7" stroke="currentColor" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+  <!-- ④ 結果 -->
+  <div class="step">
+    <div class="num">4</div>
+    <div class="title">結果を見る</div>
+    <div class="art">
+      <svg width="176" height="150" viewBox="0 0 176 150">
+        <!-- ブラウザ -->
+        <rect x="8" y="10" width="160" height="112" rx="10" fill="#fff" stroke="#e4e2dd" stroke-width="2"/>
+        <path d="M8 20 a10 10 0 0 1 10 -10 h140 a10 10 0 0 1 10 10 v8 h-160 z" fill="#f0efea"/>
+        <circle cx="20" cy="19" r="3" fill="#ff5f57"/><circle cx="30" cy="19" r="3" fill="#febc2e"/><circle cx="40" cy="19" r="3" fill="#28c840"/>
+        <!-- サムネ + main color -->
+        <rect x="18" y="38" width="36" height="44" rx="5" fill="#f3f2ee"/>
+        <path d="M29 44 h14 l9 7 -5 5 -2 -2 v22 h-18 v-22 l-2 2 -5 -5 z" fill="#1c2542" transform="translate(-4 0) scale(1)"/>
+        <rect x="62" y="38" width="30" height="30" rx="6" fill="#1c2542"/>
+        <text x="98" y="52" font-size="9" fill="#6b6b70" font-family="-apple-system, sans-serif">main color</text>
+        <text x="98" y="65" font-size="12" font-weight="700" fill="#1d1d1f" font-family="ui-monospace, Menlo, monospace">#1C2542</text>
+        <!-- 割合バー -->
+        <g transform="translate(62 76)">
+          <rect width="62" height="10" fill="#1c2542"/><rect x="62" width="22" height="10" fill="#dcdad4"/>
+          <rect x="84" width="12" height="10" fill="#961d28"/>
+        </g>
+        <g transform="translate(18 94)">
+          <rect width="20" height="16" rx="3" fill="#1c2542"/><rect x="24" width="20" height="16" rx="3" fill="#dcdad4"/>
+          <rect x="48" width="20" height="16" rx="3" fill="#961d28"/><rect x="72" width="20" height="16" rx="3" fill="#28773c"/>
+          <rect x="96" width="20" height="16" rx="3" fill="#c8aa78"/>
+        </g>
+        <!-- CSV -->
+        <g transform="translate(118 84)">
+          <rect width="48" height="58" rx="6" fill="#e8f5ec" stroke="#9fd3ae" stroke-width="2"/>
+          <path d="M8 18 h32 M8 28 h32 M8 38 h32 M20 12 v34" stroke="#6bbb83" stroke-width="2"/>
+          <text x="24" y="54" text-anchor="middle" font-size="10" font-weight="700" fill="#1f7a3e" font-family="-apple-system, sans-serif">CSV</text>
+        </g>
+      </svg>
+    </div>
+    <div class="desc">代表色の確認ページと<br>CSV（Excel で開ける）</div>
+  </div>
+
+</div>
+</body>
+</html>
