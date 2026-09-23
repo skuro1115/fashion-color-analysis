@@ -1,0 +1,44 @@
+paths:
+  images_dir: images
+  output_dir: output
+  manifest: manifest.csv       # 存在しなければ無視される
+
+image:
+  max_size: 512                # 処理時の最大辺(px)。元画像は変更しない
+
+foreground:
+  border_width: 0.03           # 背景推定に使う外周帯の幅(短辺に対する比)
+  bg_clusters: 3               # 外周ピクセルから推定する背景色候補の数
+  bg_cluster_min_share: 0.10   # 外周のこの割合以上を占める候補だけを背景色とする
+  bg_delta_e: 12.0             # 背景色からのΔE(CIE76)がこれ未満なら背景候補
+  remove_enclosed_background: false  # 腕と胴の隙間など、外周に繋がらない背景も除去するか
+  enclosed_bg_delta_e: 5.0     # 上記を除去する場合の厳しめの閾値
+  morph_kernel: 5              # opening/closing のカーネルサイズ(px)
+  min_component_ratio: 0.2     # 最大連結成分に対してこの比未満の成分は除外
+  min_component_area: 0.005    # 画像全体に対してこの比未満の成分は除外
+  use_alpha: true              # PNG等の透過チャンネルがあればそれをマスクに使う
+  min_ratio: 0.15              # 前景比率がこれ未満なら review
+  max_ratio: 0.90              # 前景比率がこれ以上なら review
+
+clustering:
+  k: 10
+  random_state: 42
+  n_init: 4
+  fit_sample: 20000            # K-means学習に使う最大ピクセル数(割当は全ピクセル)
+  edge_erode: 2                # 色抽出時だけマスク輪郭を内側に削る px (背景混じり対策, 0で無効)
+
+analysis:
+  min_cluster_ratio: 0.01      # これ未満の面積比のクラスタは除外
+  merge_delta_e: null          # null = 統合しない。例: 10.0
+  delta_e_metric: ciede2000    # ciede2000 | cie76
+
+review:
+  min_largest_component: 0.05  # 最大連結成分が画像全体のこの比未満
+  max_components: 3            # 有意な連結成分がこれより多い
+  min_largest_share: 0.6       # 前景に占める最大成分の割合がこれ未満(分散)
+  min_pixels: 2000             # 色抽出対象ピクセルがこれ未満
+  stability_scale: 0.3         # bg_delta_e を ±30% 動かしてマスクを比較
+  min_stability_iou: 0.85      # その IoU がこれ未満なら不安定
+  max_border_residual: 0.25    # 外周のうち背景色候補で説明できない割合(背景が複雑)
+  max_border_touch: 0.30       # 外周のうち前景になった割合(はみ出し/背景漏れ)
+  min_fg_bg_delta_e: 15.0      # 前景と背景の色差(中央値)がこれ未満なら分離不明瞭
