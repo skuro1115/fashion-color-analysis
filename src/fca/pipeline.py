@@ -68,7 +68,7 @@ def run_extract(
     images_dir, out_dir = Path(images_dir), Path(out_dir)
     if not images_dir.is_dir():
         raise UserError(f"画像フォルダが見つかりません: {images_dir}")
-    records = scan_images(images_dir)
+    records = scan_images(images_dir, cfg["metadata"]["seasons"])
     if not records:
         raise UserError(
             f"{images_dir}/ に画像がありません。\n"

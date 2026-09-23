@@ -3,6 +3,11 @@ paths:
   output_dir: output
   manifest: manifest.csv       # 存在しなければ無視される
 
+metadata:
+  # images/ のフォルダ名を「年_シーズン」とみなすときに認めるシーズン表記 (大文字小文字・_ - は無視)
+  # ここにない表記のフォルダ (例: 1017_ALYX) はブランド名として扱う
+  seasons: [SS, FW, AW, SPRING, SUMMER, FALL, AUTUMN, WINTER, RESORT, CRUISE, PREFALL, PRESPRING, PF, PS]
+
 image:
   max_size: 512                # 処理時の最大辺(px)。元画像は変更しない
 

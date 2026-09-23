@@ -27,6 +27,10 @@ def _e(v) -> str:
     return html.escape(str(v), quote=True)
 
 
+UNSET = '<span class="unset">%s未指定</span>'
+UNSET_KEY = "__unset__"  # フィルタ用: brand / year が空の画像
+
+
 def _text_color(r: int, g: int, b: int) -> str:
     return "#000" if (0.299 * r + 0.587 * g + 0.114 * b) > 140 else "#fff"
 
@@ -59,15 +63,17 @@ def _card(img: dict, raw: list[dict], ana: list[dict], out_dir: Path) -> str:
         f'<div class="sub">{float(main["ratio"]) * 100:.1f}% · L{float(main["L"]):.0f} a{float(main["a"]):.0f} b{float(main["b"]):.0f}</div></div></div>'
         if main else '<div class="main empty">main color なし</div>'
     )
-    meta = " / ".join(x for x in (img.get("brand"), img.get("year"), img.get("season")) if x)
+    brand = img.get("brand") or ""
+    period = " ".join(x for x in (img.get("year"), img.get("season")) if x)
+    meta = f'{_e(brand) or UNSET % "ブランド"} / {_e(period) or UNSET % "時期"}'
     fg = img.get("foreground_ratio") or ""
     fg_txt = f"{float(fg) * 100:.0f}%" if fg else "—"
     err = f'<div class="err">{_e(img["error_message"])}</div>' if img.get("error_message") else ""
     search = " ".join([img["image_id"], img.get("brand", ""), img.get("year", ""), img.get("season", ""), *reasons]).lower()
     return f"""
-<article class="card{' is-review' if review else ''}" data-review="{int(review)}" data-brand="{_e(img.get('brand', ''))}" data-search="{_e(search)}">
+<article class="card{' is-review' if review else ''}" data-review="{int(review)}" data-brand="{_e(brand or UNSET_KEY)}" data-year="{_e(img.get('year') or UNSET_KEY)}" data-search="{_e(search)}">
   <header>
-    <div><div class="id">{_e(img['image_id'])}</div><div class="meta">{_e(meta)}</div></div>
+    <div><div class="id">{_e(img['image_id'])}</div><div class="meta">{meta}</div></div>
     <div class="badge {'bad' if review else 'ok'}">{'review' if review else 'ok'}</div>
   </header>
   <div class="reasons">{reason_html}</div>{err}
@@ -107,15 +113,16 @@ h3{font-size:12px;margin:10px 0 4px;color:var(--muted);font-weight:600}
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .chip{display:flex;flex-direction:column;min-width:62px;padding:4px 6px;border-radius:5px;font-size:10px;font-family:ui-monospace,monospace;border:1px solid rgba(0,0,0,.08)}
 details{margin-top:8px}summary{cursor:pointer;color:var(--muted);font-size:12px}
+.unset{color:#a0a0a5;font-style:italic}
 .metrics{color:var(--muted);font-size:11px;margin-top:6px}.empty{color:var(--muted)}
 """
 
 JS = """
 const q=s=>document.querySelector(s),cards=[...document.querySelectorAll('.card')];
-function apply(){const rv=q('#f-review').value,br=q('#f-brand').value,t=q('#f-text').value.toLowerCase();let n=0;
-for(const c of cards){const ok=(rv==='all'||c.dataset.review===rv)&&(!br||c.dataset.brand===br)&&(!t||c.dataset.search.includes(t));c.hidden=!ok;if(ok)n++}
+function apply(){const rv=q('#f-review').value,br=q('#f-brand').value,yr=q('#f-year').value,t=q('#f-text').value.toLowerCase();let n=0;
+for(const c of cards){const ok=(rv==='all'||c.dataset.review===rv)&&(!br||c.dataset.brand===br)&&(!yr||c.dataset.year===yr)&&(!t||c.dataset.search.includes(t));c.hidden=!ok;if(ok)n++}
 q('#count').textContent=n+' / '+cards.length+' 枚'}
-['#f-review','#f-brand','#f-text'].forEach(s=>q(s).addEventListener('input',apply));apply();
+['#f-review','#f-brand','#f-year','#f-text'].forEach(s=>q(s).addEventListener('input',apply));apply();
 """
 
 
@@ -138,12 +145,21 @@ def build_preview(out_dir: Path) -> Path:
     brands = sorted({i.get("brand", "") for i in images if i.get("brand")})
     n_review = sum(1 for i in images if i.get("review") == "True")
     cards = "".join(_card(i, raw_by.get(i["image_id"], []), ana_by.get(i["image_id"], []), out_dir) for i in images)
-    brand_opts = "".join(f'<option value="{_e(b)}">{_e(b)}</option>' for b in brands)
+    years = sorted({i.get("year", "") for i in images if i.get("year")})
+
+    def opts(values, label):
+        html_ = "".join(f'<option value="{_e(v)}">{_e(v)}</option>' for v in values)
+        if any(not i.get(label) for i in images):
+            html_ += f'<option value="{UNSET_KEY}">（{"ブランド" if label == "brand" else "時期"}未指定）</option>'
+        return html_
+
+    brand_opts, year_opts = opts(brands, "brand"), opts(years, "year")
     page = f"""<!doctype html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Color Preview</title><style>{CSS}</style></head><body>
 <div class="top"><h1>代表色 preview</h1>
 <select id="f-review"><option value="all">すべて</option><option value="1">review のみ ({n_review})</option><option value="0">ok のみ</option></select>
 <select id="f-brand"><option value="">全ブランド</option>{brand_opts}</select>
+<select id="f-year"><option value="">全期間</option>{year_opts}</select>
 <input id="f-text" type="search" placeholder="ID・年・理由で検索">
 <span class="count" id="count"></span></div>
 <main class="grid">{cards}</main><script>{JS}</script></body></html>"""

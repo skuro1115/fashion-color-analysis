@@ -11,7 +11,7 @@
 ## 処理フロー
 
 ```text
-images/<brand>/<year>_<season>/*.jpg
+images/[<brand>/][<year>_<season>/]*.jpg   (フォルダは任意。ないものは未指定)
   │  image_processing/loader.py        画像列挙・パス→メタデータ・manifest.csv 結合・縮小読み込み
   │  image_processing/segmentation.py  外周から背景色推定 → 商品マスク
   │  image_processing/review.py        マスク指標 → review 理由
@@ -54,15 +54,18 @@ output/preview.html                                      ← preview ステー�
    `config.yaml` (日本語コメント付き) と `config.py` の `DEFAULTS` の両方に追加する。
 3. **出力の後方互換**。既存 CSV の列名・順序・意味を変えない。列の追加は末尾へ (`reporting/csv_io.py`)。
    `image_id` (images/ からの相対パス、拡張子なし) の形式を変えない。CSV は BOM 付き UTF-8 (Excel 対策)。
-4. **再現性**。乱数は `clustering.random_state` を使う。実行ログ (`output/logs/*.json`) の記録を消さない。
-5. **pipeline 層で print しない**。進捗は `progress` コールバック、失敗は例外で返す (GUI から再利用するため)。
-6. **非エンジニア向けメッセージ**。利用者が直せるエラーは `UserError` を日本語で投げる。traceback を見せない。
+4. **未指定のメタデータを捨てない**。`brand` / `year` / `season` は空文字 (= 未指定) がありうる
+   (`images/001.jpg`, `images/prada/001.jpg`, `images/2018_SS/001.jpg` のどれも正しい入力)。
+   集計やグラフでは空欄を除外せず「未指定」グループとして扱う。パス解釈は `loader.parse_path` に集約する。
+5. **再現性**。乱数は `clustering.random_state` を使う。実行ログ (`output/logs/*.json`) の記録を消さない。
+6. **pipeline 層で print しない**。進捗は `progress` コールバック、失敗は例外で返す (GUI から再利用するため)。
+7. **非エンジニア向けメッセージ**。利用者が直せるエラーは `UserError` を日本語で投げる。traceback を見せない。
    新しいエラーを追加したら `docs/troubleshooting.md` にも追記する。
-7. **Python 3.9 互換**。Mac 標準の python3 (3.9) で run.command が動くため。`match` 文や実行時評価される
+8. **Python 3.9 互換**。Mac 標準の python3 (3.9) で run.command が動くため。`match` 文や実行時評価される
    `X | Y` 型 (dataclass 外の `isinstance` 等) を使わない。各ファイル先頭の `from __future__ import annotations` を残す。
-8. **依存を増やすとき**は `pyproject.toml` と `requirements.txt` の両方に追加。重いライブラリは避け、必要ならオプション扱いにする。
-9. review 理由コードを追加したら `reporting/preview.py` の `REASON_LABELS` と `docs/results-guide.md` を更新する。
-10. 挙動を変えたら、関係する `docs/` (特に `technical.md`, `results-guide.md`) も更新する。README は短く保つ。
+9. **依存を増やすとき**は `pyproject.toml` と `requirements.txt` の両方に追加。重いライブラリは避け、必要ならオプション扱いにする。
+10. review 理由コードを追加したら `reporting/preview.py` の `REASON_LABELS` と `docs/results-guide.md` を更新する。
+11. 挙動を変えたら、関係する `docs/` (特に `technical.md`, `results-guide.md`) も更新する。README は短く保つ。
 
 ## 変更してよい場所の目安
 

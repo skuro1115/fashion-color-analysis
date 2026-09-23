@@ -2,9 +2,9 @@
 
 服の商品画像から **代表色を自動で取り出す** ツールです。
 
-![使い方: ダウンロード → images に画像を入れる → run.command をダブルクリック → 結果を見る](docs/images/how-to-use.png)
+## セットアップ（Mac）
 
-## Mac で使う
+![セットアップ: ダウンロード → images に画像を入れる → run.command をダブルクリック → 結果を見る](docs/images/setup.png)
 
 1. [ZIP をダウンロード](https://github.com/skuro1115/fashion-color-analysis/archive/refs/heads/main.zip)して開く
 2. `images` フォルダに服の画像を入れる
@@ -13,12 +13,15 @@
 
 > 初回だけ、準備に数分かかります。開けないときは → [困ったとき](docs/troubleshooting.md)
 
-## 結果の例
+## 実行すると
 
-![結果の確認ページ](docs/images/preview.png)
+![run.command をダブルクリックしたときの画面と、各段階の説明](docs/images/run.png)
 
-画像ごとに **main color（いちばん面積の大きい色）** と色の割合が出ます。
-自動判定があやしい画像には **review（要確認）** の印が付きます。 → [結果の見方](docs/results-guide.md)
+## 結果の見方
+
+![確認ページの見方と output フォルダのファイル](docs/images/results.png)
+
+もっと詳しく → [結果の見方](docs/results-guide.md)（実際の画面は[こちら](docs/images/preview.png)）
 
 ## ドキュメント
 

@@ -16,6 +16,10 @@ DEFAULTS: dict[str, Any] = {
         "output_dir": "output",
         "manifest": "manifest.csv",
     },
+    "metadata": {
+        "seasons": ["SS", "FW", "AW", "SPRING", "SUMMER", "FALL", "AUTUMN", "WINTER",
+                    "RESORT", "CRUISE", "PREFALL", "PRESPRING", "PF", "PS"],
+    },
     "image": {"max_size": 512},
     "foreground": {
         "border_width": 0.03,

@@ -1,0 +1,90 @@
+<!doctype html>
+<!-- 「③ 実行すると」の図。run.command の実際の表示に合わせてある。編集したら render.sh で再生成。 -->
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<style>
+  :root { --ink:#1d1d1f; --muted:#6b6b70; --line:#e4e2dd; --bg:#f6f5f1; --accent:#2f5bd3; --warn:#c2410c; }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    width: 1200px; height: 540px; background: var(--bg); color: var(--ink); padding: 34px 40px;
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
+  }
+  h1 { font-size: 26px; display: flex; align-items: center; gap: 12px; }
+  h1 .num { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 19px; display: grid; place-items: center; }
+  h1 small { font-size: 16px; color: var(--muted); font-weight: 500; }
+  .wrap { display: flex; gap: 34px; margin-top: 22px; }
+
+  .term { width: 610px; background: #1d1d1f; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.12); }
+  .bar { height: 30px; background: #2c2c2e; display: flex; align-items: center; gap: 7px; padding: 0 12px; }
+  .bar i { width: 11px; height: 11px; border-radius: 50%; display: block; }
+  .bar span { color: #9a9aa0; font-size: 12px; margin-left: auto; margin-right: auto; transform: translateX(-20px); }
+  pre {
+    font-family: ui-monospace, Menlo, monospace; font-size: 13.5px; line-height: 1.62; color: #e8e8ea;
+    padding: 14px 18px 16px; position: relative;
+  }
+  .b { color: #fff; font-weight: 700; } .blue { color: #7aa7ff; font-weight: 700; } .dim { color: #8e8e93; }
+  .ok { color: #7ee08a; font-weight: 700; } .warn { color: #ffb37a; }
+  .setup { background: rgba(122,167,255,.10); display: block; margin: 0 -18px; padding: 0 18px 0 15px; border-left: 3px solid #7aa7ff; }
+  .tag {
+    display: inline-grid; place-items: center; width: 21px; height: 21px; border-radius: 50%;
+    background: var(--accent); color: #fff; font: 700 12px -apple-system, sans-serif; vertical-align: 1px; margin-left: 8px;
+  }
+
+  .notes { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+  .note { display: flex; gap: 12px; }
+  .note .tag { margin: 2px 0 0; width: 26px; height: 26px; font-size: 14px; flex: none; }
+  .note h2 { font-size: 17px; margin-bottom: 3px; }
+  .note p { font-size: 14px; color: var(--muted); line-height: 1.55; }
+  .note b { color: var(--ink); }
+  .pill { display: inline-block; font-size: 12px; font-weight: 700; border-radius: 99px; padding: 1px 9px; margin-left: 6px; vertical-align: 2px; }
+  .pill.first { background: #e6edff; color: var(--accent); }
+  .foot { margin-top: auto; display: flex; gap: 10px; }
+  .chip { flex: 1; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .chip b { display: block; color: var(--ink); font-size: 14px; }
+  .chip.red b { color: var(--warn); }
+</style>
+</head>
+<body>
+<h1><span class="num">3</span>run.command をダブルクリックすると <small>— 何も入力しなくて OK。自動で進みます</small></h1>
+<div class="wrap">
+  <div class="term">
+    <div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>run.command</span></div>
+<pre><span class="b">==== Fashion Color Analysis ====</span>
+<span class="blue">▶ 画像を確認しています</span>
+  画像: 6 枚<span class="tag">1</span>
+<span class="setup"><span class="blue">▶ Python を確認しています</span><span class="tag">2</span>
+<span class="blue">▶ 実行環境を作っています (初回のみ)</span>
+<span class="blue">▶ 必要なライブラリをインストールしています</span>
+  完了</span><span class="blue">▶ 解析しています</span><span class="tag">3</span>
+  [1/6] prada/2018_SS/001
+  [2/6] prada/2018_SS/002  <span class="warn">← 要確認</span>
+  [3/6] prada/2018_FW/001
+  <span class="dim">...</span>
+解析完了: 6 枚 (要確認 1 枚 / エラー 0 枚)
+
+<span class="ok">✔ 完了しました</span><span class="tag">4</span>
+<span class="dim">Enter キーを押すとこの画面を閉じられます</span></pre>
+  </div>
+
+  <div class="notes">
+    <div class="note"><span class="tag">1</span><div>
+      <h2>画像を数える</h2>
+      <p>画像が 1 枚もないと、ここで止まって <b>images フォルダが開きます</b>。</p></div></div>
+    <div class="note"><span class="tag">2</span><div>
+      <h2>準備する<span class="pill first">初回だけ・数分</span></h2>
+      <p>Python の確認と、解析に使う部品のインストール。<br><b>2 回目からはこの部分を飛ばします。</b></p></div></div>
+    <div class="note"><span class="tag">3</span><div>
+      <h2>1 枚ずつ解析する</h2>
+      <p><span style="color:var(--warn);font-weight:700">← 要確認</span> は、自動判定があやしい画像。<br>あとで確認ページで目で見ます。</p></div></div>
+    <div class="note"><span class="tag">4</span><div>
+      <h2>完了</h2>
+      <p><b>確認ページ</b>と <b>output フォルダ</b>が自動で開きます。<br>黒い画面は閉じて大丈夫です。</p></div></div>
+    <div class="foot">
+      <div class="chip"><b>かかる時間</b>初回 3〜5 分 / 2 回目から数秒<br>＋ 画像 1 枚あたり約 0.2 秒</div>
+      <div class="chip red"><b>✖ 赤い文字が出たら</b>理由が表示されます<br>→ docs「困ったとき」</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

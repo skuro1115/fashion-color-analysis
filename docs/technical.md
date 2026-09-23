@@ -72,7 +72,12 @@ pipeline.build_preview("output")
 
 ## メタデータと image_id
 
-- `brand` / `year` / `season` / `filename` はパスから取得する (`2018_SS`, `2018-FW`, `2018` などに対応)
+- `brand` / `year` / `season` / `filename` はパスから取得する (`image_processing/loader.py` の `parse_path`)
+  - フォルダの深さ・順番は問わない。時期の形をしたフォルダ名は時期、それ以外で最初のフォルダ名を brand とする
+  - 時期 = 1900〜2099 の4桁の年 + 任意のシーズン (`2018`, `2018_SS`, `2018-FW`, `2018pre-fall` など)。
+    シーズン表記は `config.yaml` の `metadata.seasons` にあるものだけ認める (`1017_ALYX` をブランドとして扱うため)
+  - 取れない項目は空文字 = 未指定。`001.jpg` (指定なし)、`prada/001.jpg` (brand のみ)、`2018_SS/001.jpg` (時期のみ) がすべて扱える
+  - 集計時は空文字を「未指定」グループとして扱うこと (除外しない)
 - `image_id` は `images/` からの相対パス (拡張子なし)。例: `prada/2018_SS/001`。
   連番にしないのは、画像を追加しても既存の ID が変わらないようにするため
 - `manifest.csv` は `image_id` 列だけ必須。`brand` などが空でなければパス由来の値を上書きし、

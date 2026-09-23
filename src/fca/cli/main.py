@@ -49,7 +49,7 @@ def _run(args) -> None:
     if args.command == "init-manifest":
         from ..image_processing.loader import scan_images, write_manifest_template
 
-        n = write_manifest_template(scan_images(images_dir), Path(cfg["paths"]["manifest"]))
+        n = write_manifest_template(scan_images(images_dir, cfg["metadata"]["seasons"]), Path(cfg["paths"]["manifest"]))
         print(f"{cfg['paths']['manifest']}: {n} 行追加")
         return
 

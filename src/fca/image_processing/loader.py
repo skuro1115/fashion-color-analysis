@@ -17,8 +17,12 @@ from PIL import Image, ImageOps
 from ..errors import UserError
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp"}
-_YEAR_SEASON = re.compile(r"^(?P<year>\d{4})(?:[_\-\s]?(?P<season>[A-Za-z]+))?$")
+_PERIOD = re.compile(r"^(?P<year>(?:19|20)\d{2})(?:[_\-\s]?(?P<season>[A-Za-z][A-Za-z_\-\s]*))?$")
 PATH_FIELDS = ("brand", "year", "season")
+DEFAULT_SEASONS = (
+    "SS", "FW", "AW", "SPRING", "SUMMER", "FALL", "AUTUMN", "WINTER",
+    "RESORT", "CRUISE", "PREFALL", "PRESPRING", "PF", "PS",
+)
 
 
 @dataclass
@@ -32,26 +36,48 @@ class ImageRecord:
     extra: dict[str, str] = field(default_factory=dict)
 
 
-def parse_path(rel: Path) -> dict[str, str]:
-    """images/<brand>/<year>_<season>/<file> からメタデータを取り出す。
+def _normalize_season(text: str) -> str:
+    return re.sub(r"[_\-\s]", "", text).upper()
 
-    階層が浅い/深い場合も取れる範囲で埋め、取れない項目は空文字にする。
+
+def parse_period(name: str, seasons=DEFAULT_SEASONS):
+    """フォルダ名が時期 ("2018", "2018_SS", "2018-pre-fall" 等) なら (year, season)、違えば None。
+
+    シーズン部分は seasons (config の metadata.seasons) にあるものだけ認める。
+    "1017_ALYX" のようなブランド名を時期と誤認しないため。
     """
-    parts = rel.parts
+    m = _PERIOD.match(name.strip())
+    if not m:
+        return None
+    season = _normalize_season(m.group("season") or "")
+    if season and season not in {_normalize_season(s) for s in seasons}:
+        return None
+    return m.group("year"), season
+
+
+def parse_path(rel: Path, seasons=DEFAULT_SEASONS) -> dict[str, str]:
+    """images/ からの相対パスからメタデータを取り出す。フォルダの深さ・順番は問わない。
+
+      001.jpg                  -> すべて未指定
+      prada/001.jpg            -> brand のみ
+      2018_SS/001.jpg          -> 時期のみ
+      prada/2018_SS/001.jpg    -> brand + 時期 (2018_SS/prada/ の順でもよい)
+
+    時期の形をしたフォルダ名は時期、それ以外で最初のフォルダ名を brand とする。
+    取れない項目は空文字 (= 未指定)。
+    """
     meta = {"brand": "", "year": "", "season": "", "filename": rel.name}
-    dirs = parts[:-1]
-    if dirs:
-        meta["brand"] = dirs[0]
-    for d in dirs[1:]:
-        m = _YEAR_SEASON.match(d)
-        if m:
-            meta["year"] = m.group("year")
-            meta["season"] = (m.group("season") or "").upper()
-            break
+    for d in rel.parts[:-1]:
+        period = parse_period(d, seasons)
+        if period:
+            if not meta["year"]:
+                meta["year"], meta["season"] = period
+        elif not meta["brand"]:
+            meta["brand"] = d
     return meta
 
 
-def scan_images(images_dir: Path) -> list[ImageRecord]:
+def scan_images(images_dir: Path, seasons=DEFAULT_SEASONS) -> list[ImageRecord]:
     records = []
     for p in sorted(images_dir.rglob("*")):
         if not p.is_file() or p.suffix.lower() not in IMAGE_EXTS:
@@ -59,7 +85,7 @@ def scan_images(images_dir: Path) -> list[ImageRecord]:
         if any(part.startswith(".") for part in p.relative_to(images_dir).parts):
             continue
         rel = p.relative_to(images_dir)
-        meta = parse_path(rel)
+        meta = parse_path(rel, seasons)
         records.append(ImageRecord(image_id=rel.with_suffix("").as_posix(), path=p, **meta))
     return records
 

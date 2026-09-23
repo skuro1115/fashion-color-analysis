@@ -32,11 +32,29 @@ def _seg(img, alpha=None):
     return lab, seg
 
 
+def _meta(path):
+    m = parse_path(Path(path))
+    return m["brand"], m["year"], m["season"]
+
+
 def test_parse_path():
     assert parse_path(Path("prada/2018_SS/001.jpg")) == {
         "brand": "prada", "year": "2018", "season": "SS", "filename": "001.jpg"}
-    assert parse_path(Path("gucci/2019/x.png"))["year"] == "2019"
-    assert parse_path(Path("x.png"))["brand"] == ""
+    assert _meta("gucci/2019/x.png") == ("gucci", "2019", "")
+
+
+def test_parse_path_flexible():
+    assert _meta("001.jpg") == ("", "", "")                      # 指定なし
+    assert _meta("prada/001.jpg") == ("prada", "", "")           # ブランドのみ
+    assert _meta("2018_SS/001.jpg") == ("", "2018", "SS")        # 時期のみ
+    assert _meta("2018/001.jpg") == ("", "2018", "")
+    assert _meta("2018_SS/prada/001.jpg") == ("prada", "2018", "SS")  # 順番は問わない
+    assert _meta("prada/2018_SS/extra/001.jpg") == ("prada", "2018", "SS")
+    assert _meta("prada/2018-pre-fall/001.jpg") == ("prada", "2018", "PREFALL")
+    assert _meta("prada/2018fw/001.jpg") == ("prada", "2018", "FW")
+    # 時期に見えるがシーズン表記が未知 / 年の範囲外 -> ブランド扱い
+    assert _meta("1017_ALYX/001.jpg") == ("1017_ALYX", "", "")
+    assert _meta("3000/001.jpg") == ("3000", "", "")
 
 
 def test_white_background_navy_garment():
@@ -125,3 +143,20 @@ def test_end_to_end(tmp_path):
     assert (out / "raw_colors.csv").read_text() == first
 
     assert build_preview(out).exists()
+
+
+def test_unspecified_metadata_end_to_end(tmp_path):
+    root = tmp_path / "images"
+    img = Image.fromarray(_garment((255, 255, 255), (31, 39, 70)))
+    for rel in ["loose.jpg", "brand_x/a.jpg", "2020_FW/b.jpg"]:
+        (root / rel).parent.mkdir(parents=True, exist_ok=True)
+        img.save(root / rel)
+    cfg = load_config(None)
+    cfg["paths"]["manifest"] = str(tmp_path / "none.csv")
+    out = tmp_path / "output"
+    run_extract(cfg, root, out)
+    rows = {r["image_id"]: (r["brand"], r["year"], r["season"]) for r in read_csv(out / "images.csv")}
+    assert rows == {
+        "loose": ("", "", ""), "brand_x/a": ("brand_x", "", ""), "2020_FW/b": ("", "2020", "FW")}
+    html = build_preview(out).read_text()
+    assert "ブランド未指定" in html and "時期未指定" in html
