@@ -19,6 +19,11 @@ DEFAULTS: dict[str, Any] = {
     "metadata": {
         "seasons": ["SS", "FW", "AW", "SPRING", "SUMMER", "FALL", "AUTUMN", "WINTER",
                     "RESORT", "CRUISE", "PREFALL", "PRESPRING", "PF", "PS"],
+        "genders": {
+            "men": ["men", "mens", "man", "male", "メンズ", "男性"],
+            "women": ["women", "womens", "woman", "female", "ladies", "レディース", "女性"],
+            "unisex": ["unisex", "ユニセックス", "男女兼用"],
+        },
     },
     "image": {"max_size": 512},
     "foreground": {
@@ -38,9 +43,10 @@ DEFAULTS: dict[str, Any] = {
     "clustering": {"k": 10, "random_state": 42, "n_init": 4, "fit_sample": 20000, "edge_erode": 2},
     "analysis": {
         "min_cluster_ratio": 0.01,
-        "merge_delta_e": None,
+        "merge_delta_e": 10.0,
         "delta_e_metric": "ciede2000",
     },
+    "dataset": {"n_sub_colors": 2, "min_sub_ratio": 0.05},
     "review": {
         "min_largest_component": 0.05,
         "max_components": 3,

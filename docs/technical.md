@@ -27,7 +27,8 @@ samples/             動作確認用の合成画像
 output/              出力 (git 管理外)
 ├── images.csv          画像単位の情報・review 判定・抽出指標
 ├── raw_colors.csv      K-means k=10 の生クラスタ (一次データ)
-├── analysis_colors.csv 除外・統合後の色 (color_rank=1 が main color)
+├── analysis_colors.csv 除外・統合後の色 (1色1行, color_rank=1 が main color)
+├── dataset.csv         分析用データ (1画像1行: メタデータ + メイン色・サブ色と面積)
 ├── preview.html
 ├── masks/  cutouts/    商品マスクと切り抜き PNG
 └── logs/               実行日時・設定・バージョン・枚数の JSON / エラーログ
@@ -77,6 +78,7 @@ pipeline.build_preview("output")
   - 時期 = 1900〜2099 の4桁の年 + 任意のシーズン (`2018`, `2018_SS`, `2018-FW`, `2018pre-fall` など)。
     シーズン表記は `config.yaml` の `metadata.seasons` にあるものだけ認める (`1017_ALYX` をブランドとして扱うため)
   - 取れない項目は空文字 = 未指定。`001.jpg` (指定なし)、`prada/001.jpg` (brand のみ)、`2018_SS/001.jpg` (時期のみ) がすべて扱える
+  - 性別: フォルダ名が `config.yaml` の `metadata.genders` の語 (men / mens / women / レディース 等) なら gender に正規化した値 (`men` / `women` / `unisex`) を入れる
   - 集計時は空文字を「未指定」グループとして扱うこと (除外しない)
 - `image_id` は `images/` からの相対パス (拡張子なし)。例: `prada/2018_SS/001`。
   連番にしないのは、画像を追加しても既存の ID が変わらないようにするため
@@ -106,7 +108,15 @@ pipeline.build_preview("output")
 2. ΔE (`ciede2000` / `cie76`) が `merge_delta_e` 未満の最近接ペアを、ピクセル数で重み付けした Lab 平均に統合（繰り返し）
 3. 面積比を再計算して並べ替え。`source_clusters` にどの raw クラスタから来たかを残す
 
-`merge_delta_e: null`（統合なし）が既定。合成画像では **CIEDE2000 で 10 前後**にすると陰影によるクラスタ分裂が1色にまとまった。実画像で調整すること。
+`merge_delta_e: 10`（CIEDE2000）が既定。合成画像ではこの値で陰影によるクラスタ分裂が1色にまとまり、別の色（紺とベージュ等）は分かれた。実画像で調整すること。`null` で統合なし。
+
+### dataset.csv (`analysis/dataset.py`)
+
+- images.csv と analysis_colors.csv を `image_id` で結合し、1画像1行にする
+- メイン色 = analysis の面積1位。サブ色 = 2位以降のうち面積比が `dataset.min_sub_ratio` 以上のもの（最大 `dataset.n_sub_colors` 色）。足りない枠は空欄
+- 各色は `{main,sub1,sub2}_{hex,ratio,r,g,b_rgb,L,a,b}`。ratio は analysis 後の面積比（除外後の合計が 1）
+- 色が取れなかった画像やメタデータ未指定の画像も行を残す（`review` 列で絞り込む前提）
+- 列は analyze のたびに作り直す派生データ。列を増やすときは末尾（`TAIL_COLS` の前後）に足す
 
 ### review 判定 (`image_processing/review.py`)
 
@@ -143,7 +153,9 @@ pipeline.build_preview("output")
 | `image` | `max_size`: 処理時の最大辺 |
 | `foreground` | 背景推定・マスク処理の閾値、`min_ratio` / `max_ratio` |
 | `clustering` | `k` (=10), `random_state`, `edge_erode` |
+| `metadata` | フォルダ名から読むシーズン表記 (`seasons`) と性別の語 (`genders`) |
 | `analysis` | `min_cluster_ratio`, `merge_delta_e`, `delta_e_metric` |
+| `dataset` | `n_sub_colors` (サブ色の数), `min_sub_ratio` (サブ色にする最小面積比) |
 | `review` | review 判定の各閾値 |
 
 各項目の意味は config.yaml のコメントを参照。

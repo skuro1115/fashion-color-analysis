@@ -7,6 +7,11 @@ metadata:
   # images/ のフォルダ名を「年_シーズン」とみなすときに認めるシーズン表記 (大文字小文字・_ - は無視)
   # ここにない表記のフォルダ (例: 1017_ALYX) はブランド名として扱う
   seasons: [SS, FW, AW, SPRING, SUMMER, FALL, AUTUMN, WINTER, RESORT, CRUISE, PREFALL, PRESPRING, PF, PS]
+  # フォルダ名を性別とみなす語 (左が dataset.csv に入る値)。大文字小文字・_ - 空白は無視
+  genders:
+    men: [men, mens, man, male, メンズ, 男性]
+    women: [women, womens, woman, female, ladies, レディース, 女性]
+    unisex: [unisex, ユニセックス, 男女兼用]
 
 image:
   max_size: 512                # 処理時の最大辺(px)。元画像は変更しない
@@ -34,8 +39,12 @@ clustering:
 
 analysis:
   min_cluster_ratio: 0.01      # これ未満の面積比のクラスタは除外
-  merge_delta_e: null          # null = 統合しない。例: 10.0
+  merge_delta_e: 10.0          # 似た色 (影・照明の差) をまとめる距離 (CIEDE2000)。null = 統合しない
   delta_e_metric: ciede2000    # ciede2000 | cie76
+
+dataset:                       # dataset.csv (1画像1行) の設定
+  n_sub_colors: 2              # メイン色のほかに何色までサブ色として並べるか
+  min_sub_ratio: 0.05          # 面積比がこれ未満の色はサブ色にしない (空欄になる)
 
 review:
   min_largest_component: 0.05  # 最大連結成分が画像全体のこの比未満

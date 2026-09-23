@@ -8,7 +8,7 @@ size() {  # 図ごとの大きさ (CSS px)。PNG はこの 2 倍の解像度に�
   case "$1" in
     setup) echo 1200,420 ;;
     run) echo 1200,540 ;;
-    results) echo 1200,600 ;;
+    results) echo 1200,620 ;;
     *) echo 1200,600 ;;
   esac
 }

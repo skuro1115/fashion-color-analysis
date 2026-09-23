@@ -26,24 +26,35 @@
 
 Excel や Google スプレッドシートで開けます。
 
-### analysis_colors.csv — 画像ごとの色（分析にはこれを使う）
+### dataset.csv — 分析用データ（まずはこれを使う）
 
-| image_id | color_rank | hex | ratio |
-| --- | --- | --- | --- |
-| prada/2018_SS/001 | 1 | #1C2542 | 0.62 |
-| prada/2018_SS/001 | 2 | #DCDAD4 | 0.17 |
+1枚の画像が1行。色とブランド・年代・性別が1行にまとまっているので、Excel でそのまま絞り込み・集計できます。
 
-`color_rank = 1` の行が main color です。
+| image_id | brand | year | season | gender | main_hex | main_ratio | sub1_hex | sub1_ratio | review |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| prada/women/2018_SS/001 | prada | 2018 | SS | women | #1C2542 | 0.72 | #C8AA78 | 0.21 | False |
+| gucci/2019_FW/004 | gucci | 2019 | FW | | #8F1C26 | 1.0 | | | False |
 
-### images.csv — 画像ごとの情報
+| 列 | 意味 |
+| --- | --- |
+| `main_hex` / `main_ratio` | **メイン色**（いちばん面積が大きい色）とその面積の割合 |
+| `sub1_…` / `sub2_…` | **サブ色**（2番目・3番目に大きい色）。面積が 5% 未満なら空欄 |
+| `…_r` `…_g` `…_b_rgb` | 色を赤・緑・青（0〜255）で表したもの |
+| `…_L` `…_a` `…_b` | 色を「明るさ・赤み・黄み」で表したもの（色の近さを計算するとき用） |
+| `all_colors` | その画像のすべての色と割合（例 `#1C2542:72.0%;#C8AA78:21.0%`） |
+| `review` | `True` なら要確認。分析から外すときはこの列で絞り込む |
 
-| image_id | brand | year | season | review | review_reasons |
-| --- | --- | --- | --- | --- | --- |
-| prada/2018_SS/001 | prada | 2018 | SS | False | |
-| prada/2018_SS/002 | prada | 2018 | SS | True | fg_too_small |
+- `brand` / `year` / `season` / `gender` が空欄 = フォルダで指定しなかった（未指定の）画像です。
+  確認ページでは「ブランド未指定」などと表示され、上のメニューで絞り込めます。
+- サブ色の数や「5%」の基準は `config.yaml` の `dataset:` で変えられます。
 
-`image_id` で 2つの CSV をつなげられます。
-`brand` / `year` / `season` が空欄の画像は、フォルダで指定しなかった（未指定の）画像です。確認ページでは「ブランド未指定」「時期未指定」と表示され、上のメニューで絞り込めます。
+### images.csv — 画像ごとの詳しい情報
+
+切り抜きの指標や要確認の理由（`review_reasons`）など。`image_id` で dataset.csv とつなげられます。
+
+### analysis_colors.csv — 画像ごとの色（縦長）
+
+1色1行の形式です（`color_rank = 1` がメイン色）。色ごとに集計したいとき用。
 
 ### raw_colors.csv
 

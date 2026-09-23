@@ -14,7 +14,7 @@ IMAGE_COLS = [
     "processing_status", "error_message", "original_path", "processed_width", "processed_height",
     "segmentation_method", "foreground_ratio", "fg_pixels", "n_components",
     "largest_component_ratio", "largest_share", "border_touch", "border_residual",
-    "fg_bg_delta_e", "stability_iou",
+    "fg_bg_delta_e", "stability_iou", "gender",
 ]
 RAW_COLS = ["image_id", "cluster_rank", "L", "a", "b", "r", "g", "b_rgb", "hex", "ratio", "pixels"]
 ANALYSIS_COLS = [

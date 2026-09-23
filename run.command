@@ -108,7 +108,7 @@ fi
 printf "\n\033[1;32m✔ 完了しました\033[0m\n"
 echo "  結果は output フォルダにあります:"
 echo "    preview.html        … ブラウザで結果を確認するページ (自動で開きます)"
-echo "    analysis_colors.csv … 画像ごとの色 (Excel で開けます)"
+echo "    dataset.csv         … 分析用データ: 1画像1行 (メイン色・サブ色と面積、ブランド・年代・性別)"
 echo "    images.csv          … 画像ごとの情報・要確認フラグ"
 echo "  結果の見方: docs/results-guide.md"
 open_if_allowed output/preview.html

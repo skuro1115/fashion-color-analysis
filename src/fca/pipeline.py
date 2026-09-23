@@ -1,7 +1,7 @@
 """解析の公開 API。CLI・run.command・将来の GUI (Streamlit 等) はすべてここを呼ぶ。
 
     run_extract(cfg, images_dir, out_dir, progress=...)  画像 -> images.csv, raw_colors.csv
-    run_analyze(cfg, out_dir)                            raw_colors.csv -> analysis_colors.csv
+    run_analyze(cfg, out_dir)                            raw_colors.csv -> analysis_colors.csv, dataset.csv
     build_preview(out_dir)                               -> preview.html
 
 この層では print しない。進捗は progress コールバックで呼び出し側へ渡す。
@@ -18,6 +18,7 @@ import cv2
 import numpy as np
 from PIL import Image
 
+from .analysis.dataset import build_dataset, dataset_columns
 from .analysis.merge import analyze_clusters
 from .color_extraction.colorspace import rgb_to_lab
 from .color_extraction.kmeans import extract_clusters
@@ -68,7 +69,7 @@ def run_extract(
     images_dir, out_dir = Path(images_dir), Path(out_dir)
     if not images_dir.is_dir():
         raise UserError(f"画像フォルダが見つかりません: {images_dir}")
-    records = scan_images(images_dir, cfg["metadata"]["seasons"])
+    records = scan_images(images_dir, **cfg["metadata"])
     if not records:
         raise UserError(
             f"{images_dir}/ に画像がありません。\n"
@@ -87,6 +88,7 @@ def run_extract(
     for i, rec in enumerate(records, start=1):
         row = {
             "image_id": rec.image_id, "brand": rec.brand, "year": rec.year, "season": rec.season,
+            "gender": rec.gender,
             "filename": rec.filename, "original_path": str(rec.path), **rec.extra,
         }
         try:
@@ -136,6 +138,15 @@ def run_analyze(cfg: dict, out_dir: Path) -> dict:
         for c in analyze_clusters(clusters, cfg["analysis"]):
             rows.append({"image_id": image_id, **c})
     write_csv(out_dir / "analysis_colors.csv", ANALYSIS_COLS, rows)
-    stats = {"n_images": len(by_image), "n_colors": len(rows)}
+
+    # 1画像1行の分析用データ (メイン色・サブ色 + メタデータ)
+    colors_by_image: dict = {}
+    for r in rows:
+        colors_by_image.setdefault(r["image_id"], []).append(r)
+    images = read_csv(out_dir / "images.csv") if (out_dir / "images.csv").exists() else []
+    dataset = build_dataset(images, colors_by_image, cfg["dataset"])
+    write_csv(out_dir / "dataset.csv", dataset_columns(cfg["dataset"]), dataset)
+
+    stats = {"n_images": len(by_image), "n_colors": len(rows), "n_dataset_rows": len(dataset)}
     write_run_log(out_dir, "analyze", cfg, stats)
     return stats

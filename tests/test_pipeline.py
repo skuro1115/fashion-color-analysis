@@ -3,6 +3,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
+from fca.analysis.dataset import build_dataset
 from fca.analysis.merge import analyze_clusters
 from fca.color_extraction.colorspace import rgb_to_lab
 from fca.color_extraction.kmeans import extract_clusters
@@ -39,7 +40,7 @@ def _meta(path):
 
 def test_parse_path():
     assert parse_path(Path("prada/2018_SS/001.jpg")) == {
-        "brand": "prada", "year": "2018", "season": "SS", "filename": "001.jpg"}
+        "brand": "prada", "year": "2018", "season": "SS", "gender": "", "filename": "001.jpg"}
     assert _meta("gucci/2019/x.png") == ("gucci", "2019", "")
 
 
@@ -55,6 +56,16 @@ def test_parse_path_flexible():
     # 時期に見えるがシーズン表記が未知 / 年の範囲外 -> ブランド扱い
     assert _meta("1017_ALYX/001.jpg") == ("1017_ALYX", "", "")
     assert _meta("3000/001.jpg") == ("3000", "", "")
+
+
+def test_parse_path_gender():
+    g = lambda p: parse_path(Path(p))["gender"]
+    assert g("prada/women/2018_SS/001.jpg") == "women"
+    assert g("Mens/001.jpg") == "men"
+    assert g("prada/メンズ/001.jpg") == "men"
+    assert g("unisex/001.jpg") == "unisex"
+    assert g("prada/001.jpg") == ""
+    assert _meta("women/prada/001.jpg") == ("prada", "", "")   # 性別フォルダはブランドにしない
 
 
 def test_white_background_navy_garment():
@@ -160,3 +171,27 @@ def test_unspecified_metadata_end_to_end(tmp_path):
         "loose": ("", "", ""), "brand_x/a": ("brand_x", "", ""), "2020_FW/b": ("", "2020", "FW")}
     html = build_preview(out).read_text()
     assert "ブランド未指定" in html and "時期未指定" in html
+
+    run_analyze(cfg, out)
+    ds = {r["image_id"]: r for r in read_csv(out / "dataset.csv")}
+    assert set(ds) == {"loose", "brand_x/a", "2020_FW/b"}   # 未指定も含めて全画像
+    assert ds["loose"]["main_hex"].startswith("#") and ds["loose"]["brand"] == ""
+
+
+def test_build_dataset_main_and_sub():
+    images = [{"image_id": "a", "brand": "prada", "year": "2018", "season": "SS", "gender": "women",
+               "review": "False", "review_reasons": ""},
+              {"image_id": "b", "brand": "", "year": "", "season": "", "gender": "", "review": "True",
+               "review_reasons": "error"}]
+    def c(rank, hex_, ratio):
+        return {"color_rank": str(rank), "hex": hex_, "ratio": str(ratio), "r": 0, "g": 0, "b_rgb": 0,
+                "L": 0, "a": 0, "b": 0}
+    colors = {"a": [c(1, "#1C2542", 0.70), c(2, "#C8AA78", 0.27), c(3, "#FFFFFF", 0.03)]}
+    rows = build_dataset(images, colors, {"n_sub_colors": 2, "min_sub_ratio": 0.05})
+    a, b = rows
+    assert (a["main_hex"], a["main_ratio"]) == ("#1C2542", "0.7")
+    assert (a["sub1_hex"], a["sub1_ratio"]) == ("#C8AA78", "0.27")
+    assert "sub2_hex" not in a          # 3% は min_sub_ratio 未満
+    assert a["all_colors"] == "#1C2542:70.0%;#C8AA78:27.0%;#FFFFFF:3.0%"
+    assert a["gender"] == "women"
+    assert b["n_colors"] == 0 and "main_hex" not in b   # 色が取れない画像も行は残す

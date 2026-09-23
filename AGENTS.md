@@ -11,7 +11,7 @@
 ## 処理フロー
 
 ```text
-images/[<brand>/][<year>_<season>/]*.jpg   (フォルダは任意。ないものは未指定)
+images/[<brand>/][<gender>/][<year>_<season>/]*.jpg   (フォルダは任意・順不同。ないものは未指定)
   │  image_processing/loader.py        画像列挙・パス→メタデータ・manifest.csv 結合・縮小読み込み
   │  image_processing/segmentation.py  外周から背景色推定 → 商品マスク
   │  image_processing/review.py        マスク指標 → review 理由
@@ -19,8 +19,9 @@ images/[<brand>/][<year>_<season>/]*.jpg   (フォルダは任意。ないもの
   ▼
 output/images.csv, raw_colors.csv, masks/, cutouts/     ← extract ステージ
   │  analysis/merge.py                 小クラスタ除外・近似色統合 (画像は読まない)
+  │  analysis/dataset.py               images.csv と結合して 1画像1行に (メイン色・サブ色)
   ▼
-output/analysis_colors.csv                               ← analyze ステージ
+output/analysis_colors.csv, dataset.csv                  ← analyze ステージ
   │  reporting/preview.py
   ▼
 output/preview.html                                      ← preview ステージ
@@ -54,7 +55,7 @@ output/preview.html                                      ← preview ステー�
    `config.yaml` (日本語コメント付き) と `config.py` の `DEFAULTS` の両方に追加する。
 3. **出力の後方互換**。既存 CSV の列名・順序・意味を変えない。列の追加は末尾へ (`reporting/csv_io.py`)。
    `image_id` (images/ からの相対パス、拡張子なし) の形式を変えない。CSV は BOM 付き UTF-8 (Excel 対策)。
-4. **未指定のメタデータを捨てない**。`brand` / `year` / `season` は空文字 (= 未指定) がありうる
+4. **未指定のメタデータを捨てない**。`brand` / `year` / `season` / `gender` は空文字 (= 未指定) がありうる
    (`images/001.jpg`, `images/prada/001.jpg`, `images/2018_SS/001.jpg` のどれも正しい入力)。
    集計やグラフでは空欄を除外せず「未指定」グループとして扱う。パス解釈は `loader.parse_path` に集約する。
 5. **再現性**。乱数は `clustering.random_state` を使う。実行ログ (`output/logs/*.json`) の記録を消さない。
@@ -72,7 +73,7 @@ output/preview.html                                      ← preview ステー�
 | 要望の例 | 触る場所 |
 | --- | --- |
 | 色数・閾値・画像サイズ | `config.yaml` のみ (コード変更不要) |
-| 集計 CSV・グラフ | `analysis/` に集計関数、`pipeline.py` にステージ追加、`cli/main.py` にサブコマンド |
+| 集計 CSV・グラフ | 入力は `dataset.csv` (1画像1行) を基本にする。`analysis/` に集計関数、`pipeline.py` にステージ追加、`cli/main.py` にサブコマンド |
 | preview の見た目・別ページ | `reporting/preview.py` |
 | CSV に列追加 | `reporting/csv_io.py` の列定義 (末尾) + 値を作る処理。manifest 由来の列は自動で images.csv に付く |
 | GUI (Streamlit 等) | 新しいパッケージ (例 `src/fca/gui/` や `app.py`) から `pipeline` を呼ぶ。コアロジックは変えない |

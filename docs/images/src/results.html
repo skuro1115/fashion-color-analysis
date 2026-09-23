@@ -8,7 +8,7 @@
           --navy:#1c2542; --beige:#c8aa78; --white:#e9e7e1; }
   * { box-sizing: border-box; margin: 0; }
   body {
-    width: 1200px; height: 600px; background: var(--bg); color: var(--ink); padding: 34px 40px;
+    width: 1200px; height: 620px; background: var(--bg); color: var(--ink); padding: 34px 40px;
     font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif;
   }
   h1 { font-size: 26px; display: flex; align-items: center; gap: 12px; }
@@ -66,7 +66,7 @@
 <h1><span class="num">4</span>結果の見方 <small>— 自動で開く確認ページ (output/preview.html)</small></h1>
 <div class="wrap">
   <div class="card">
-    <div class="sec"><span class="tag">1</span><div class="hd"><div><div class="id">prada/2018_SS/001</div><div class="meta">prada / 2018 / SS</div></div><div class="badge">ok</div></div></div>
+    <div class="sec"><span class="tag">1</span><div class="hd"><div><div class="id">prada/women/2018_SS/001</div><div class="meta">prada / 2018 SS / women</div></div><div class="badge">ok</div></div></div>
 
     <div class="sec" style="margin-top:14px"><span class="tag" style="top:48px">2</span><div class="imgs" style="margin-top:0">
       <figure><svg viewBox="0 0 100 124"><rect width="100" height="124" fill="#f1f0ec"/>
@@ -97,9 +97,9 @@
          <span class="mini" style="background:var(--bad)">review</span> 目で確認してほしい（理由も表示）</p></div></div>
     <div class="note"><span class="tag">2</span><div><h2>切り抜きチェック</h2>
       <p>「切り抜き後」に<b>服だけが残っていれば OK</b>。<br>背景が混ざっていたら、その画像の色は信用しない。</p></div></div>
-    <div class="note"><span class="tag">3</span><div><h2>main color（代表色）</h2>
+    <div class="note"><span class="tag">3</span><div><h2>main color（メイン色）</h2>
       <p>服の中で<b>いちばん面積が大きい色</b>。<br>#1C2542 は色コードで、デザインツールにそのまま貼れる。</p></div></div>
-    <div class="note"><span class="tag">4</span><div><h2>色の割合</h2>
+    <div class="note"><span class="tag">4</span><div><h2>色の割合（2番目以降がサブ色）</h2>
       <p>服の中でそれぞれの色が<b>何 % を占めるか</b>。</p></div></div>
     <div class="note"><span class="tag">5</span><div><h2>細かい内訳</h2>
       <p>機械的に 10 色に分けた元のデータ。<b>普段は見なくて OK</b>。</p></div></div>
@@ -107,8 +107,8 @@
     <div class="files">
       <h3>📁 output フォルダ</h3>
       <div class="row"><code>preview.html</code><span>この確認ページ</span></div>
-      <div class="row"><code>analysis_colors.csv</code><span>画像ごとの色 — <b>分析にはこれ</b>（Excel で開ける）</span></div>
-      <div class="row"><code>images.csv</code><span>画像ごとの情報・要確認の一覧</span></div>
+      <div class="row"><code>dataset.csv</code><span><b>分析用データ</b> — 1画像1行（メイン色・サブ色と面積、<br>ブランド・年代・性別）。Excel で開ける</span></div>
+      <div class="row"><code>images.csv</code><span>画像ごとの詳しい情報・要確認の理由</span></div>
     </div>
   </div>
 </div>
