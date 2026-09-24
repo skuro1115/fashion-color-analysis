@@ -8,7 +8,7 @@
 ブランドの服画像から代表色を抽出し、ブランド・年代・シーズンごとの色彩傾向を分析できるデータ (CSV) を作る研究用ツール。
 正確さより「怪しいものを review=true で人間確認に回す」ことを優先する。重い AI モデル (SAM, YOLO 等) は明示的に頼まれない限り導入しない。
 
-## 3つのモード
+## 4つのモード
 
 利用者の依頼を、まずどのモードかで受け止める。手順の詳細は `.claude/skills/<名前>/SKILL.md`
 (Claude Code 以外のエージェントもこのファイルを読んで同じように振る舞うこと)。
@@ -18,9 +18,14 @@
 | 要望を整える (`request`) | 「こんな機能がほしい」「相談したい」 | 質問して `docs/requests/` に要望書を作る | 実装・設定変更 |
 | 使い方を理解する (`guide`) | 「どう使うの？」「この結果の意味は？」 | 利用者の実際の状態を見て平易に説明 | ファイル変更 |
 | ツールを実行する (`run-analysis`) | 「分析して」「もう一度回して」 | 事前チェック → 実行 → 結果の要約 | コード変更 |
+| 最新版にする (`update`) | 「更新したい」「最新にして」 | GitHub の新しい版を安全に取り込む (git pull) | push・利用者の変更の破棄 |
 | (改修) | 「実装して」「直して」 | 下記のルールに従って変更・テスト | — |
 
 依頼があいまいなときは、どのモードかを1行で確認してから進める。大きな改修は先に `request` で要望書を作る。
+「更新したい」は「最新版を取り込む (update)」と「機能を変える (request / 改修)」のどちらにも取れるので、文脈で判断し、迷えば聞く。
+
+Claude Code では起動時に `.claude/hooks/check-update.sh` (SessionStart フック、`.claude/settings.json`) が GitHub の新しい版を確認し、
+あれば利用者に知らせる。確認だけで、更新は必ず `update` モードで同意を得てから行う。
 
 ## 将来の道具
 
@@ -64,7 +69,8 @@ output/preview.html                                      ← preview ステー�
 | `docs/` | 人間向けドキュメント。`technical.md` が仕様の詳細 |
 | `docs/roadmap.md` | 将来の計画と、道具どうしの受け渡しの約束 |
 | `docs/requests/` | 要望書 (request モードの成果物)。`TEMPLATE.md` が型 |
-| `.claude/skills/` | 3つのモードの手順書 (request / guide / run-analysis) |
+| `.claude/skills/` | 4つのモードの手順書 (request / guide / run-analysis / update) |
+| `.claude/settings.json`, `.claude/hooks/` | Claude Code のプロジェクト設定。起動時の更新確認フックと、git の読み取り・`pull --ff-only` の許可 |
 | `.agents/skills/` | 上と同じ内容のコピー (Codex 等の他エージェント向け)。**片方を変えたらもう片方も同じにする** (テストで検査) |
 | `docs/images/src/` | README 等の図の元 HTML。PNG は直接編集せず、ここを直して再生成する |
 
