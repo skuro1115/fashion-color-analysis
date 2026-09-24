@@ -45,6 +45,7 @@ analysis:
 dataset:                       # dataset.csv (1画像1行) の設定
   n_sub_colors: 2              # メイン色のほかに何色までサブ色として並べるか
   min_sub_ratio: 0.05          # 面積比がこれ未満の色はサブ色にしない (空欄になる)
+  achromatic_chroma: 8.0       # 鮮やかさ(Lab の彩度)がこれ未満の色は黒・白・グレー扱いにし、色相 (hue) を空欄にする
 
 review:
   min_largest_component: 0.05  # 最大連結成分が画像全体のこの比未満

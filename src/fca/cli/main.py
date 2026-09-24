@@ -63,7 +63,7 @@ def _run(args) -> None:
         s = pipeline.run_analyze(cfg, out_dir)
         print(f"色の整理完了: {s['n_images']} 枚 / {s['n_colors']} 色")
     if args.command in ("preview", "run"):
-        print(f"確認ページ: {pipeline.build_preview(out_dir)}")
+        print(f"確認ページ: {pipeline.build_preview(out_dir, cfg)}")
 
 
 def main(argv: list | None = None) -> None:

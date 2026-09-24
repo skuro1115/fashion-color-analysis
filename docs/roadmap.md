@@ -15,7 +15,7 @@ flowchart LR
 | ② | データ収集ツール | 💭 構想のみ | ブランドのページから服の画像と情報を集めて ① に渡す |
 | ③ | パワポ作成 skill | 💭 構想のみ | ① の結果からブランド・年代の色の傾向をスライドにする |
 
-やりたいことが決まったら、AI に **「要望を整理したい」**（`/request`）と伝えると、要望書を一緒に作れます。 → [AI で改修する](ai-customization.md)
+やりたいことが決まったら、AI に **「要望を整理したい」**（`/request`）と伝えると、要望書を一緒に作れます。 → [AI に頼む](ai-customization.md)
 
 ---
 
@@ -75,7 +75,8 @@ images/[ブランド/][性別/][年_シーズン/]画像.jpg     フォルダは
 
 ### ① → ③：`output/dataset.csv`
 
-- 1画像1行。`image_id` `brand` `year` `season` `gender`、`main_*` / `sub1_*` / `sub2_*`（`hex` `ratio` `r` `g` `b_rgb` `L` `a` `b`）、`n_colors` `all_colors` `review` `review_reasons`
+- 1画像1行。`image_id` `brand` `year` `season` `gender`、`main_*` / `sub1_*` / `sub2_*`（`hex` `ratio` `r` `g` `b_rgb` `L` `a` `b`）、`n_colors` `all_colors` `review` `review_reasons`、
+  末尾に `main_*` / `sub1_*` / `sub2_*` の HSB（`hue` `sat` `bri`。無彩色の hue は空欄）
 - 空欄のメタデータ = 未指定（集計で除外しない）
 - 列の追加は末尾のみ。既存列の名前・意味は変えない
 

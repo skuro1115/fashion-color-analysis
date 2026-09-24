@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import colorsys
+import math
+from typing import Optional
+
 import numpy as np
 from skimage import color as skcolor
 
@@ -32,3 +36,17 @@ def delta_e(lab1: np.ndarray, lab2: np.ndarray, metric: str = "ciede2000") -> np
     if metric == "cie76":
         return skcolor.deltaE_cie76(lab1, lab2)
     raise ValueError(f"unknown delta_e metric: {metric}")
+
+
+def rgb_to_hsb(r, g, b, lab_a: float, lab_b: float, achromatic_chroma: float) -> tuple:
+    """RGB (0-255) -> (色相 0-360 or None, 彩度 0-100, 明度 0-100)。HSB = HSV。
+
+    Lab の彩度 (chroma = sqrt(a^2 + b^2)) が achromatic_chroma 未満の色は無彩色
+    (黒・白・グレー) とみなし、色相を None にする。HSV の色相は無彩色で不安定なため。
+    色相は円なので、集計で平均するときは単純平均ではなく円周平均を使うこと。
+    """
+    h, s, v = colorsys.rgb_to_hsv(float(r) / 255, float(g) / 255, float(b) / 255)
+    hue: Optional[float] = round(h * 360, 1) % 360
+    if math.hypot(float(lab_a), float(lab_b)) < achromatic_chroma:
+        hue = None
+    return hue, round(s * 100, 1), round(v * 100, 1)

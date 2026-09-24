@@ -7,9 +7,13 @@
 
 from __future__ import annotations
 
+from ..color_extraction.colorspace import rgb_to_hsb
+
 META_COLS = ["image_id", "brand", "year", "season", "gender"]
 COLOR_FIELDS = ["hex", "ratio", "r", "g", "b_rgb", "L", "a", "b"]
 TAIL_COLS = ["n_colors", "all_colors", "review", "review_reasons"]
+# HSB (色相・彩度・明度) は後から追加したので、後方互換のため全列の末尾に並べる
+HSB_FIELDS = ["hue", "sat", "bri"]
 
 
 def slot_names(n_sub: int) -> list[str]:
@@ -20,7 +24,10 @@ def dataset_columns(cfg: dict) -> list[str]:
     cols = list(META_COLS)
     for slot in slot_names(int(cfg["n_sub_colors"])):
         cols += [f"{slot}_{f}" for f in COLOR_FIELDS]
-    return cols + TAIL_COLS
+    cols += TAIL_COLS
+    for slot in slot_names(int(cfg["n_sub_colors"])):
+        cols += [f"{slot}_{f}" for f in HSB_FIELDS]
+    return cols
 
 
 def build_dataset(images: list[dict], colors_by_image: dict, cfg: dict) -> list[dict]:
@@ -28,6 +35,7 @@ def build_dataset(images: list[dict], colors_by_image: dict, cfg: dict) -> list[
 
     サブ色は面積比が min_sub_ratio 以上のものだけ入れ、足りない枠は空欄にする。
     all_colors には除外前の全色を "hex:割合%" の形で並べる。
+    各色には HSB (hue 色相° / sat 彩度 / bri 明度) も付ける。無彩色の hue は空欄。
     brand などが空 (未指定) の画像も除外しない。
     """
     slots = slot_names(int(cfg["n_sub_colors"]))
@@ -40,6 +48,10 @@ def build_dataset(images: list[dict], colors_by_image: dict, cfg: dict) -> list[
         for slot, color in zip(slots, picked):
             for f in COLOR_FIELDS:
                 row[f"{slot}_{f}"] = color[f]
+            hue, sat, bri = rgb_to_hsb(color["r"], color["g"], color["b_rgb"], color["a"], color["b"],
+                                       float(cfg["achromatic_chroma"]))
+            row[f"{slot}_hue"] = "" if hue is None else hue
+            row[f"{slot}_sat"], row[f"{slot}_bri"] = sat, bri
         row["n_colors"] = len(colors)
         row["all_colors"] = ";".join(f'{c["hex"]}:{float(c["ratio"]) * 100:.1f}%' for c in colors)
         row["review"] = img.get("review", "")

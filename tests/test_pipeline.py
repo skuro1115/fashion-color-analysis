@@ -187,7 +187,9 @@ def test_build_dataset_main_and_sub():
         return {"color_rank": str(rank), "hex": hex_, "ratio": str(ratio), "r": 0, "g": 0, "b_rgb": 0,
                 "L": 0, "a": 0, "b": 0}
     colors = {"a": [c(1, "#1C2542", 0.70), c(2, "#C8AA78", 0.27), c(3, "#FFFFFF", 0.03)]}
-    rows = build_dataset(images, colors, {"n_sub_colors": 2, "min_sub_ratio": 0.05})
+    colors["a"][0].update(r=28, g=37, b_rgb=66, a=6.2, b=-20.7)        # 紺
+    colors["a"][1].update(r=200, g=170, b_rgb=120, a=4.2, b=29.9)      # ベージュ
+    rows = build_dataset(images, colors, {"n_sub_colors": 2, "min_sub_ratio": 0.05, "achromatic_chroma": 8.0})
     a, b = rows
     assert (a["main_hex"], a["main_ratio"]) == ("#1C2542", "0.7")
     assert (a["sub1_hex"], a["sub1_ratio"]) == ("#C8AA78", "0.27")
@@ -195,3 +197,18 @@ def test_build_dataset_main_and_sub():
     assert a["all_colors"] == "#1C2542:70.0%;#C8AA78:27.0%;#FFFFFF:3.0%"
     assert a["gender"] == "women"
     assert b["n_colors"] == 0 and "main_hex" not in b   # 色が取れない画像も行は残す
+    assert (a["main_hue"], a["main_sat"], a["main_bri"]) == (225.8, 57.6, 25.9)
+    assert 35 < a["sub1_hue"] < 40
+
+
+def test_hsb_achromatic_and_column_order():
+    from fca.analysis.dataset import dataset_columns
+    from fca.color_extraction.colorspace import rgb_to_hsb
+
+    assert rgb_to_hsb(128, 128, 128, 0.0, 0.0, 8.0) == (None, 0.0, 50.2)      # グレー: 色相なし
+    assert rgb_to_hsb(30, 30, 34, 0.5, -2.5, 8.0)[0] is None                  # ほぼ黒: 色相なし
+    assert rgb_to_hsb(200, 30, 40, 60.0, 35.0, 8.0)[0] == 356.5               # 赤
+    cols = dataset_columns({"n_sub_colors": 2})
+    # 既存列の並びは変えず、HSB は末尾に追加
+    assert cols.index("review_reasons") < cols.index("main_hue")
+    assert cols[-3:] == ["sub2_hue", "sub2_sat", "sub2_bri"]

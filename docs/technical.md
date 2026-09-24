@@ -116,6 +116,10 @@ pipeline.build_preview("output")
 - メイン色 = analysis の面積1位。サブ色 = 2位以降のうち面積比が `dataset.min_sub_ratio` 以上のもの（最大 `dataset.n_sub_colors` 色）。足りない枠は空欄
 - 各色は `{main,sub1,sub2}_{hex,ratio,r,g,b_rgb,L,a,b}`。ratio は analysis 後の面積比（除外後の合計が 1）
 - 色が取れなかった画像やメタデータ未指定の画像も行を残す（`review` 列で絞り込む前提）
+- HSB 列 `{slot}_{hue,sat,bri}`：RGB から HSV（= HSB）に変換。hue は度、sat / bri は 0〜100。
+  Lab の chroma（√(a²+b²)）が `dataset.achromatic_chroma` 未満なら無彩色とみなし hue を空欄にする（HSV の色相は無彩色で不安定なため）。
+  後方互換のため HSB 列は全列の末尾に置く。色のクラスタリング・統合は引き続き Lab で行い、HSB は解釈用の派生値
+- hue は円周量。集計では円周平均（ベクトル平均）か分布（ビン分け）を使う
 - 列は analyze のたびに作り直す派生データ。列を増やすときは末尾（`TAIL_COLS` の前後）に足す
 
 ### review 判定 (`image_processing/review.py`)

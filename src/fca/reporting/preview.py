@@ -6,6 +6,8 @@ import html
 import os
 from pathlib import Path
 
+from ..color_extraction.colorspace import rgb_to_hsb
+from ..config import DEFAULTS
 from .csv_io import read_csv, safe_name
 
 REASON_LABELS = {
@@ -31,6 +33,13 @@ UNSET = '<span class="unset">%s未指定</span>'
 UNSET_KEY = "__unset__"  # フィルタ用: brand / year が空の画像
 
 
+def _hsb_text(c: dict, achromatic_chroma: float) -> str:
+    """確認ページ用の「色相 225° · 彩度 58 · 明度 26」表記 (判定は dataset.csv と同じ)。"""
+    hue, sat, bri = rgb_to_hsb(c["r"], c["g"], c["b_rgb"], c["a"], c["b"], achromatic_chroma)
+    hue_txt = "無彩色" if hue is None else f"色相 {hue:.0f}°"
+    return f"{hue_txt} · 彩度 {sat:.0f} · 明度 {bri:.0f}"
+
+
 def _text_color(r: int, g: int, b: int) -> str:
     return "#000" if (0.299 * r + 0.587 * g + 0.114 * b) > 140 else "#fff"
 
@@ -50,7 +59,7 @@ def _palette(colors: list[dict], rank_key: str) -> str:
     return f'<div class="bar">{bar}</div><div class="chips">{chips}</div>'
 
 
-def _card(img: dict, raw: list[dict], ana: list[dict], out_dir: Path) -> str:
+def _card(img: dict, raw: list[dict], ana: list[dict], out_dir: Path, achromatic_chroma: float) -> str:
     name = safe_name(img["image_id"])
     orig = os.path.relpath(img["original_path"], out_dir) if img.get("original_path") else ""
     review = img.get("review") == "True"
@@ -60,7 +69,7 @@ def _card(img: dict, raw: list[dict], ana: list[dict], out_dir: Path) -> str:
     main_html = (
         f'<div class="main"><span class="swatch" style="background:{main["hex"]}"></span>'
         f'<div><div class="lbl">main color</div><div class="hex">{main["hex"]}</div>'
-        f'<div class="sub">{float(main["ratio"]) * 100:.1f}% · L{float(main["L"]):.0f} a{float(main["a"]):.0f} b{float(main["b"]):.0f}</div></div></div>'
+        f'<div class="sub">{float(main["ratio"]) * 100:.1f}% · {_hsb_text(main, achromatic_chroma)}</div></div></div>'
         if main else '<div class="main empty">main color なし</div>'
     )
     brand = img.get("brand") or ""
@@ -127,12 +136,13 @@ q('#count').textContent=n+' / '+cards.length+' 枚'}
 """
 
 
-def build_preview(out_dir: Path) -> Path:
+def build_preview(out_dir: Path, cfg: dict | None = None) -> Path:
     out_dir = Path(out_dir)
     if not (out_dir / "images.csv").exists():
         from ..errors import UserError
 
         raise UserError(f"{out_dir}/images.csv がありません。先に画像の解析を実行してください。")
+    achromatic_chroma = float((cfg or DEFAULTS)["dataset"]["achromatic_chroma"])
     images = read_csv(out_dir / "images.csv")
     raw = read_csv(out_dir / "raw_colors.csv")
     ana_path = out_dir / "analysis_colors.csv"
@@ -145,7 +155,7 @@ def build_preview(out_dir: Path) -> Path:
 
     brands = sorted({i.get("brand", "") for i in images if i.get("brand")})
     n_review = sum(1 for i in images if i.get("review") == "True")
-    cards = "".join(_card(i, raw_by.get(i["image_id"], []), ana_by.get(i["image_id"], []), out_dir) for i in images)
+    cards = "".join(_card(i, raw_by.get(i["image_id"], []), ana_by.get(i["image_id"], []), out_dir, achromatic_chroma) for i in images)
     years = sorted({i.get("year", "") for i in images if i.get("year")})
 
     def opts(values, label):

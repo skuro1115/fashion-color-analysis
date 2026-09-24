@@ -46,7 +46,7 @@ DEFAULTS: dict[str, Any] = {
         "merge_delta_e": 10.0,
         "delta_e_metric": "ciede2000",
     },
-    "dataset": {"n_sub_colors": 2, "min_sub_ratio": 0.05},
+    "dataset": {"n_sub_colors": 2, "min_sub_ratio": 0.05, "achromatic_chroma": 8.0},
     "review": {
         "min_largest_component": 0.05,
         "max_components": 3,

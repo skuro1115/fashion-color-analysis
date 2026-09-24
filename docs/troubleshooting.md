@@ -70,7 +70,7 @@ run.command をダブルクリック → 警告が出たら「完了」
 ## 予期しないエラーが発生しました
 
 `output/logs/error_日時.log` に詳細が保存されています。
-Claude Code 等の AI にこのファイルを見せて「このエラーを直して」と頼むと調べてもらえます。 → [AI で改修する](ai-customization.md)
+Claude Code 等の AI にこのファイルを見せて「このエラーを直して」と頼むと調べてもらえます。 → [AI に頼む](ai-customization.md)
 
 ---
 
