@@ -9,3 +9,7 @@ images/*
 !images/README.txt
 output/
 .venv-run/
+
+# Claude Code のローカル設定・作業用
+.claude/worktrees/
+.claude/settings.local.json

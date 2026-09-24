@@ -39,3 +39,13 @@ def test_no_images_gives_friendly_error(tmp_path, capsys):
               "-c", str(tmp_path / "none.yaml")])
     assert e.value.code == 2
     assert "画像がありません" in capsys.readouterr().err
+
+
+def test_skills_have_matching_names():
+    """.claude/skills/<名前>/SKILL.md の name がフォルダ名と一致し、説明があること。"""
+    skills = sorted((ROOT / ".claude" / "skills").glob("*/SKILL.md"))
+    assert {p.parent.name for p in skills} >= {"request", "guide", "run-analysis"}
+    for p in skills:
+        head = p.read_text(encoding="utf-8").split("---")[1]
+        assert f"name: {p.parent.name}\n" in head, p
+        assert "description:" in head, p
