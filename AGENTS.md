@@ -65,6 +65,7 @@ output/preview.html                                      ← preview ステー�
 | `docs/roadmap.md` | 将来の計画と、道具どうしの受け渡しの約束 |
 | `docs/requests/` | 要望書 (request モードの成果物)。`TEMPLATE.md` が型 |
 | `.claude/skills/` | 3つのモードの手順書 (request / guide / run-analysis) |
+| `.agents/skills/` | 上と同じ内容のコピー (Codex 等の他エージェント向け)。**片方を変えたらもう片方も同じにする** (テストで検査) |
 | `docs/images/src/` | README 等の図の元 HTML。PNG は直接編集せず、ここを直して再生成する |
 
 レイヤーの向き: `cli` / `run.command` / GUI → `pipeline` → 各処理パッケージ。逆向きの import を作らない。

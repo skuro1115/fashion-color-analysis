@@ -49,3 +49,12 @@ def test_skills_have_matching_names():
         head = p.read_text(encoding="utf-8").split("---")[1]
         assert f"name: {p.parent.name}\n" in head, p
         assert "description:" in head, p
+
+
+def test_agents_skills_mirror_claude_skills():
+    """.agents/skills (Codex 等向け) は .claude/skills と同じ内容に保つ。"""
+    claude = {p.relative_to(ROOT / ".claude" / "skills"): p.read_text(encoding="utf-8")
+              for p in (ROOT / ".claude" / "skills").glob("*/SKILL.md")}
+    agents = {p.relative_to(ROOT / ".agents" / "skills"): p.read_text(encoding="utf-8")
+              for p in (ROOT / ".agents" / "skills").glob("*/SKILL.md")}
+    assert agents == claude, ".claude/skills を変えたら .agents/skills にも同じ内容をコピーしてください"
